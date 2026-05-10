@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Not Found — {{VENUE_NAME}}</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --accent:#{{ACCENT_COLOR}}; }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'DM Sans',sans-serif; background:#fafaf8; min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:24px; -webkit-font-smoothing:antialiased; }
+    .wrap { text-align:center; max-width:360px; }
+    .icon { font-size:56px; margin-bottom:20px; }
+    h1 { font-family:'DM Serif Display',Georgia,serif; font-size:28px; font-weight:400; margin-bottom:8px; }
+    p { font-size:15px; color:#6b7280; line-height:1.6; margin-bottom:24px; }
+    a { display:inline-flex; align-items:center; gap:6px; padding:11px 22px; background:var(--accent); color:white; text-decoration:none; border-radius:9px; font-size:14px; font-weight:500; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="icon">🗺️</div>
+    <h1>Page not found</h1>
+    <p>That page doesn't exist. Tap the link below to return to the venue information page.</p>
+    <a href="/">← Back to home</a>
+  </div>
+</body>
+</html>

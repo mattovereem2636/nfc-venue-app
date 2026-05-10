@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="{{VENUE_NAME}} — {{DOC_LABEL}}">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{{VENUE_NAME}} — {{DOC_LABEL}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent:       #{{ACCENT_COLOR}};
+      --accent-light: color-mix(in srgb, #{{ACCENT_COLOR}} 12%, white);
+      --text:         #1a1a1a;
+      --text-muted:   #6b7280;
+      --surface:      #fafaf8;
+      --card:         #ffffff;
+      --border:       #e5e5e0;
+      --radius:       16px;
+      --shadow:       0 2px 24px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--surface);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Page layout ── */
+    .page {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    .header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--card);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .header-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: white;
+    }
+    .header-text { flex: 1; min-width: 0; }
+    .venue-name {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 18px;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .doc-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-top: 1px;
+    }
+
+    /* ── Main content ── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      gap: 12px;
+    }
+
+    /* ── Status bar ── */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 13px;
+    }
+    .status-live {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #16a34a;
+      font-weight: 500;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #16a34a;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.85); }
+    }
+    .status-meta {
+      color: var(--text-muted);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    /* ── PDF Viewer card ── */
+    .viewer-card {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 60vh;
+    }
+    .viewer-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      background: #f9f9f7;
+    }
+    .viewer-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .open-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      background: var(--accent);
+      color: white;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .open-btn:active { opacity: 0.85; transform: scale(0.98); }
+    .open-btn svg { width: 14px; height: 14px; fill: white; }
+
+    /* PDF embed */
+    .pdf-frame-wrap {
+      flex: 1;
+      position: relative;
+    }
+    .pdf-frame {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* Loading overlay */
+    .loading-overlay {
+      position: absolute;
+      inset: 0;
+      background: var(--card);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      z-index: 5;
+      transition: opacity 0.4s;
+    }
+    .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 14px; color: var(--text-muted); }
+
+    /* ── No document state ── */
+    .no-doc {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 48px 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      gap: 12px;
+    }
+    .no-doc-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: var(--accent-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 4px;
+    }
+    .no-doc-icon svg { width: 28px; height: 28px; fill: var(--accent); }
+    .no-doc h2 {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 22px;
+      font-weight: 400;
+    }
+    .no-doc p { font-size: 15px; color: var(--text-muted); line-height: 1.55; max-width: 280px; }
+
+    /* ── Footer ── */
+    .footer {
+      padding: 14px 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      background: var(--card);
+    }
+    .footer a { color: var(--text-muted); text-decoration: underline; }
+
+    /* ── Responsive: tablet/desktop ── */
+    @media (min-width: 600px) {
+      .main { padding: 24px; max-width: 720px; margin: 0 auto; width: 100%; }
+      .viewer-card { min-height: 70vh; }
+    }
+    @media (min-width: 1024px) {
+      .main { max-width: 960px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-icon">
+        <!-- NFC tap icon -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-5 14.5h-2V12h-2v-2h2V8h2v8.5zm-4-4c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2z"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <div class="venue-name">{{VENUE_NAME}}</div>
+        <div class="doc-label" id="docLabelDisplay">{{DOC_LABEL}}</div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="main">
+
+      <!-- Status bar (shown when PDF exists) -->
+      <div class="status-bar" style="display:{{SHOW_VIEWER}}">
+        <div class="status-live">
+          <div class="pulse"></div>
+          Live document
+        </div>
+        <div class="status-meta" id="updatedAt">
+          {{UPDATED_AT}}
+          <span style="display:block; opacity:0.7">{{FILE_SIZE}}</span>
+        </div>
+      </div>
+
+      <!-- PDF Viewer (shown when PDF exists) -->
+      <div class="viewer-card" style="display:{{SHOW_VIEWER}}" id="viewerCard">
+        <div class="viewer-toolbar">
+          <span class="viewer-title" id="viewerTitle">{{DOC_LABEL}}</span>
+          <a class="open-btn" id="openBtn" href="{{PDF_URL}}" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+            Open full screen
+          </a>
+        </div>
+        <div class="pdf-frame-wrap">
+          <div class="loading-overlay" id="loadingOverlay">
+            <div class="spinner"></div>
+            <div class="loading-text">Loading {{DOC_LABEL}}…</div>
+          </div>
+          <iframe
+            class="pdf-frame"
+            id="pdfFrame"
+            src="{{PDF_URL}}"
+            title="{{DOC_LABEL}}"
+            loading="lazy"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+
+      <!-- No document state -->
+      <div class="no-doc" style="display:{{SHOW_NO_DOC_MSG}}">
+        <div class="no-doc-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
+        </div>
+        <h2>No document yet</h2>
+        <p>The venue hasn't published a document yet. Check back shortly or ask a staff member for assistance.</p>
+      </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      {{VENUE_NAME}} &nbsp;·&nbsp; <a href="/privacy">Privacy</a>
+    </footer>
+
+  </div>
+
+  <script>
+    // Hide loading overlay when PDF iframe loads
+    const frame = document.getElementById('pdfFrame');
+    const overlay = document.getElementById('loadingOverlay');
+
+    if (frame && overlay) {
+      let timeout = setTimeout(() => {
+        overlay.classList.add('hidden');
+      }, 8000); // Fallback: hide after 8s regardless
+
+      frame.addEventListener('load', () => {
+        clearTimeout(timeout);
+        setTimeout(() => overlay.classList.add('hidden'), 300);
+      });
+    }
+
+    // Periodically check for document updates (every 60 seconds)
+    // If document has changed, show a reload prompt
+    const initialLabel = '{{DOC_LABEL}}';
+    const initialUpdated = '{{UPDATED_AT}}';
+
+    setInterval(async () => {
+      try {
+        const res  = await fetch('/api/status');
+        const data = await res.json();
+        if (
+          data.hasDocument &&
+          data.updatedAtFmt !== initialUpdated &&
+          initialUpdated !== ''
+        ) {
+          const bar = document.querySelector('.status-live');
+          if (bar) {
+            bar.innerHTML = `
+              <div class="pulse"></div>
+              <span style="color:var(--accent); font-weight:600; cursor:pointer"
+                onclick="window.location.reload()">
+                Document updated — tap to reload ↺
+              </span>`;
+          }
+        }
+      } catch (e) { /* network error — ignore */ }
+    }, 60000);
+  </script>
+</body>
+</html>

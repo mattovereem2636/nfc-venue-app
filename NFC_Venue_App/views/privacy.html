@@ -1,0 +1,49 @@
+<!-- views/privacy.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — {{VENUE_NAME}}</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --accent:#{{ACCENT_COLOR}}; --text:#1a1a1a; --muted:#6b7280; --border:#e5e5e0; }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'DM Sans',sans-serif; color:var(--text); background:#fafaf8; padding:40px 20px 80px; -webkit-font-smoothing:antialiased; }
+    .wrap { max-width:620px; margin:0 auto; }
+    h1 { font-family:'DM Serif Display',Georgia,serif; font-size:32px; font-weight:400; margin-bottom:8px; }
+    .sub { color:var(--muted); font-size:14px; margin-bottom:36px; }
+    h2 { font-size:16px; font-weight:600; margin:28px 0 8px; }
+    p  { font-size:15px; line-height:1.65; color:#374151; margin-bottom:12px; }
+    a  { color:var(--accent); }
+    .back { display:inline-flex; align-items:center; gap:6px; color:var(--muted); text-decoration:none; font-size:14px; margin-bottom:32px; }
+    .back:hover { color:var(--text); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a href="/" class="back">← Back</a>
+    <h1>Privacy Policy</h1>
+    <p class="sub">{{VENUE_NAME}} · Last updated {{YEAR}}</p>
+
+    <h2>What we collect</h2>
+    <p>When you tap an NFC tag or visit this page, our web server records standard server log data: your IP address, browser type, device type, time of access, and the page requested. This data is used solely for security monitoring and system diagnostics.</p>
+
+    <h2>What we don't collect</h2>
+    <p>We do not collect your name, email address, phone number, or any personally identifying information through this NFC system. We do not require you to create an account or log in.</p>
+
+    <h2>Third-party services</h2>
+    <p>This site may use a URL shortening service to route NFC tags. That service may independently log tap events including approximate location, device type, and access time. Please refer to your URL shortener's privacy policy for details.</p>
+    <p>We use Google Fonts to display typography. Google may collect standard font-request data per their <a href="https://policies.google.com/privacy" target="_blank">privacy policy</a>.</p>
+
+    <h2>Cookies</h2>
+    <p>This site uses a single session cookie for the administrator panel only. Guest-facing pages do not set any cookies.</p>
+
+    <h2>Data retention</h2>
+    <p>Server logs are retained for a maximum of 30 days and then automatically deleted. No personal data is retained beyond this period.</p>
+
+    <h2>Contact</h2>
+    <p>For questions about this privacy policy, please contact a {{VENUE_NAME}} staff member in person or ask at the information desk.</p>
+  </div>
+</body>
+</html>

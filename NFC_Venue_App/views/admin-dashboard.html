@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Dashboard — {{VENUE_NAME}} Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent:      #{{ACCENT_COLOR}};
+      --accent-bg:   color-mix(in srgb, #{{ACCENT_COLOR}} 10%, white);
+      --text:        #1a1a1a;
+      --muted:       #6b7280;
+      --border:      #e5e5e0;
+      --surface:     #f4f4f1;
+      --card:        #ffffff;
+      --green:       #16a34a;
+      --green-bg:    #f0fdf4;
+      --green-bdr:   #86efac;
+      --red:         #dc2626;
+      --red-bg:      #fef2f2;
+      --red-bdr:     #fca5a5;
+      --orange:      #d97706;
+      --orange-bg:   #fffbeb;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--surface);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Top nav ── */
+    .topnav {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-icon {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-icon svg { width: 18px; height: 18px; fill: white; }
+    .nav-title {
+      font-size: 15px;
+      font-weight: 500;
+    }
+    .nav-sub { font-size: 12px; color: var(--muted); }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .nav-view-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 13px; color: var(--muted); text-decoration: none;
+      padding: 6px 12px; border-radius: 7px; border: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    .nav-view-btn:hover { background: var(--surface); color: var(--text); }
+    .nav-view-btn svg { width: 13px; height: 13px; fill: currentColor; }
+    .logout-btn {
+      font-size: 13px; color: var(--muted); background: none; border: none;
+      cursor: pointer; padding: 6px 10px; border-radius: 7px; font-family: inherit;
+    }
+    .logout-btn:hover { background: var(--red-bg); color: var(--red); }
+
+    /* ── Page container ── */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+    .page-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 28px;
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+    .page-sub { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+
+    /* ── Alert banners ── */
+    .alert {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 13px 16px; border-radius: 10px; margin-bottom: 20px; font-size: 14px;
+    }
+    .alert svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
+    .alert-success { background: var(--green-bg); border: 1px solid var(--green-bdr); color: var(--green); }
+    .alert-error   { background: var(--red-bg);   border: 1px solid var(--red-bdr);   color: var(--red); }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      margin-bottom: 20px; overflow: hidden;
+    }
+    .card-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-title {
+      font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px;
+    }
+    .card-title svg { width: 16px; height: 16px; fill: var(--muted); }
+    .card-body { padding: 20px; }
+
+    /* ── Live status card ── */
+    .live-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--green-bg); color: var(--green); border: 1px solid var(--green-bdr);
+      font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px;
+    }
+    .live-dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+    .status-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px;
+    }
+    .status-item { }
+    .status-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 3px; }
+    .status-value { font-size: 14px; font-weight: 500; }
+    .status-value.mono { font-family: 'Courier New', monospace; font-size: 12px; word-break: break-all; }
+
+    .no-doc-notice {
+      display: flex; align-items: center; gap: 10px;
+      padding: 16px; background: var(--orange-bg);
+      border: 1px solid #fcd34d; border-radius: 10px;
+      font-size: 14px; color: var(--orange);
+    }
+    .no-doc-notice svg { width: 20px; height: 20px; fill: var(--orange); flex-shrink: 0; }
+
+    /* ── Upload form ── */
+    .upload-form { display: flex; flex-direction: column; gap: 16px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 13px; font-weight: 500; }
+    .field small { font-size: 12px; color: var(--muted); }
+
+    .input, select {
+      padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 9px;
+      font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text);
+      background: #fafaf8; outline: none; width: 100%;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+      background: white;
+    }
+
+    /* Drop zone */
+    .drop-zone {
+      border: 2px dashed var(--border); border-radius: 12px;
+      padding: 32px 24px; text-align: center; cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      position: relative;
+    }
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: var(--accent); background: var(--accent-bg);
+    }
+    .drop-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .drop-icon { font-size: 32px; margin-bottom: 8px; }
+    .drop-text { font-size: 14px; color: var(--muted); }
+    .drop-text strong { color: var(--accent); }
+    .drop-selected { margin-top: 10px; font-size: 13px; font-weight: 500; color: var(--green); }
+    .size-warn { color: var(--orange); font-size: 12px; margin-top: 6px; }
+
+    .submit-btn {
+      padding: 12px 20px; background: var(--accent); color: white;
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+      border: none; border-radius: 9px; cursor: pointer; width: 100%;
+      transition: opacity 0.15s, transform 0.1s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .submit-btn:hover  { opacity: 0.92; }
+    .submit-btn:active { transform: scale(0.99); }
+    .submit-btn svg { width: 16px; height: 16px; fill: white; }
+
+    /* ── History table ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      text-align: left; padding: 10px 12px;
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #fafaf8; }
+    tbody tr.active-row { background: var(--green-bg); }
+    td { padding: 10px 12px; vertical-align: middle; }
+    td.mono { font-family: 'Courier New', monospace; font-size: 11px; color: var(--muted); white-space: nowrap; }
+    td.filename-cell { font-family: 'Courier New', monospace; font-size: 11px; color: var(--muted); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .badge-live {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--green); color: white; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 20px; white-space: nowrap;
+    }
+    .btn-rollback {
+      font-size: 12px; padding: 4px 10px; background: none; border: 1px solid var(--border);
+      border-radius: 6px; cursor: pointer; font-family: inherit; color: var(--muted);
+      transition: background 0.1s, color 0.1s;
+    }
+    .btn-rollback:hover { background: var(--orange-bg); color: var(--orange); border-color: #fcd34d; }
+    td.empty-msg { color: var(--muted); padding: 24px; text-align: center; font-size: 14px; }
+
+    /* ── Footer ── */
+    .footer-note {
+      margin-top: 32px; font-size: 12px; color: var(--muted); text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      .status-grid { grid-template-columns: 1fr; }
+      .container { padding: 16px 14px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top nav -->
+  <nav class="topnav">
+    <div class="nav-brand">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+      </div>
+      <div>
+        <div class="nav-title">{{VENUE_NAME}} Admin</div>
+        <div class="nav-sub">Logged in · {{LOGIN_TIME}}</div>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <a href="/" target="_blank" class="nav-view-btn">
+        <svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+        Guest view
+      </a>
+      <form method="POST" action="/admin/logout" style="display:inline">
+        <button type="submit" class="logout-btn">Sign out</button>
+      </form>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1 class="page-title">Document Manager</h1>
+    <p class="page-sub">Upload a new PDF or manage the currently active document</p>
+
+    <!-- Success banner -->
+    <div class="alert alert-success" style="display:{{SHOW_SUCCESS}}">
+      <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+      <span>{{SUCCESS_MSG}}</span>
+    </div>
+
+    <!-- Error banner -->
+    <div class="alert alert-error" style="display:{{SHOW_ERROR_BANNER}}">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+      <span>{{ERROR_MSG}}</span>
+    </div>
+
+    <!-- Current status card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
+          Active Document
+        </div>
+        <div class="live-badge" style="display:{{SHOW_CURRENT}}">
+          <div class="live-dot"></div> LIVE
+        </div>
+      </div>
+      <div class="card-body">
+
+        <div style="display:{{SHOW_CURRENT}}">
+          <div class="status-grid">
+            <div class="status-item">
+              <div class="status-label">Document Label</div>
+              <div class="status-value">{{CURRENT_LABEL}}</div>
+            </div>
+            <div class="status-item">
+              <div class="status-label">Last Updated</div>
+              <div class="status-value">{{CURRENT_UPDATED}}</div>
+            </div>
+            <div class="status-item" style="grid-column: 1 / -1">
+              <div class="status-label">Filename</div>
+              <div class="status-value mono">{{CURRENT_FILENAME}}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="no-doc-notice" style="display:{{SHOW_NO_DOC}}">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          No document published yet. Upload a PDF below to go live.
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Upload new document card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg>
+          Upload New Document
+        </div>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="/admin/upload" enctype="multipart/form-data" class="upload-form" id="uploadForm">
+
+          <div class="field">
+            <label for="docLabel">Document Label</label>
+            <input class="input" type="text" id="docLabel" name="docLabel"
+              placeholder="e.g. Venue Map, Event Schedule, Exhibitor Guide"
+              value="{{ACTIVE_DOC_LABEL}}" required maxlength="60">
+            <small>This label is shown to guests on the landing page</small>
+          </div>
+
+          <div class="field">
+            <label>PDF File</label>
+            <div class="drop-zone" id="dropZone">
+              <input type="file" name="pdf" id="pdfInput" accept=".pdf,application/pdf" required>
+              <div class="drop-icon">📄</div>
+              <div class="drop-text">
+                <strong>Click to choose</strong> or drag and drop<br>
+                PDF only · Max {{MAX_MB}}MB
+              </div>
+              <div class="drop-selected" id="selectedFile" style="display:none"></div>
+              <div class="size-warn" id="sizeWarn" style="display:none">
+                ⚠️ This file may be too large for reliable mobile delivery. Consider compressing it at smallpdf.com before uploading.
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="staffNote">Staff Note <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+            <input class="input" type="text" id="staffNote" name="staffNote"
+              placeholder="e.g. Updated for Day 2, Fixed room numbers" maxlength="100">
+            <small>Logged internally for audit purposes — not shown to guests</small>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">
+            <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg>
+            Upload &amp; Publish
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Version history card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 00-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 017-7 7 7 0 017 7 7 7 0 01-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0013 21a9 9 0 000-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+          Version History
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Label</th>
+              <th>Uploaded</th>
+              <th>Size</th>
+              <th>Filename</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{HISTORY_ROWS}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      Session expires after 2 hours of inactivity &nbsp;·&nbsp;
+      <a href="/" style="color:var(--muted)">View guest page</a>
+    </div>
+  </div>
+
+  <script>
+    const dropZone    = document.getElementById('dropZone');
+    const pdfInput    = document.getElementById('pdfInput');
+    const selectedDiv = document.getElementById('selectedFile');
+    const sizeWarn    = document.getElementById('sizeWarn');
+    const submitBtn   = document.getElementById('submitBtn');
+    const MAX_WARN_MB = 5;
+    const MAX_HARD_MB = {{MAX_MB}};
+
+    function formatSize(bytes) {
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    pdfInput.addEventListener('change', () => {
+      const file = pdfInput.files[0];
+      if (!file) return;
+      selectedDiv.style.display = 'block';
+      selectedDiv.textContent = `✓ ${file.name}  (${formatSize(file.size)})`;
+      sizeWarn.style.display = file.size > MAX_WARN_MB * 1024 * 1024 ? 'block' : 'none';
+    });
+
+    // Drag & drop
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave',()  => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', (e)     => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type === 'application/pdf') {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        pdfInput.files = dt.files;
+        pdfInput.dispatchEvent(new Event('change'));
+      }
+    });
+
+    // Uploading state on submit
+    document.getElementById('uploadForm').addEventListener('submit', () => {
+      submitBtn.textContent = 'Uploading…';
+      submitBtn.disabled = true;
+    });
+
+    // Auto-dismiss alerts after 8 seconds
+    setTimeout(() => {
+      document.querySelectorAll('.alert').forEach(a => {
+        a.style.transition = 'opacity 0.5s';
+        a.style.opacity = '0';
+        setTimeout(() => a.style.display = 'none', 500);
+      });
+    }, 8000);
+  </script>
+</body>
+</html>

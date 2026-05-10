@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>{{DOC_LABEL}} — {{VENUE_NAME}}</title>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    html, body { height:100%; overflow:hidden; background:#404040; font-family:system-ui,sans-serif; }
+    .bar {
+      height: 44px;
+      background: #1a1a1a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 10;
+    }
+    .bar-title { color: #e5e5e5; font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
+    .bar-back { color: #9ca3af; font-size: 13px; text-decoration: none; display: flex; align-items: center; gap: 4px; }
+    .bar-back:hover { color: white; }
+    iframe {
+      position: fixed;
+      top: 44px; left: 0; right: 0; bottom: 0;
+      width: 100%;
+      height: calc(100% - 44px);
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <a href="/" class="bar-back">← Back</a>
+    <span class="bar-title">{{DOC_LABEL}}</span>
+    <a href="{{PDF_URL}}" download class="bar-back">⬇ Save</a>
+  </div>
+  <iframe src="{{PDF_URL}}" title="{{DOC_LABEL}}"></iframe>
+</body>
+</html>
